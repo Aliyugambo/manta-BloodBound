@@ -50,7 +50,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white relative overflow-hidden">
-      {/* Background gradient glow */}
       <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-black to-black blur-3xl pointer-events-none" />
 
       {/* Hero Section */}
@@ -81,20 +80,18 @@ export default function HomePage() {
           transition={{ delay: 0.4 }}
           className="flex flex-col md:flex-row gap-4"
         >
-         <Link
-  href="/auth?tab=register"
-  className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg transition-all duration-300"
->
-  Become a Donor
-</Link>
-
-<Link
-  href="/auth?tab=login"
-  className="border border-red-500 hover:bg-red-600/20 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300"
->
-  Request Blood
-</Link>
-
+          <Link
+            href="/auth?tab=register"
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg transition-all duration-300"
+          >
+            Become a Donor
+          </Link>
+          <Link
+            href="/auth?tab=login"
+            className="border border-red-500 hover:bg-red-600/20 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300"
+          >
+            Request Blood
+          </Link>
         </motion.div>
       </section>
 
@@ -117,7 +114,6 @@ export default function HomePage() {
               />
             </AnimatePresence>
 
-            {/* Animated glowing border */}
             <div className="absolute inset-0 rounded-2xl border border-red-700/30 animate-pulse" />
           </div>
 
@@ -143,7 +139,6 @@ export default function HomePage() {
               {carouselItems[index].caption}
             </motion.p>
 
-            {/* Manual Controls */}
             <div className="flex gap-3 mt-6">
               {carouselItems.map((_, i) => (
                 <button
@@ -161,62 +156,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Feature Section */}
-      <section className="relative z-10 py-20 bg-black border-t border-red-900/30">
-        <h2 className="text-center text-3xl font-bold mb-14">
-          Why Choose <span className="text-red-500">BloodBound?</span>
-        </h2>
-
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 px-6">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="bg-zinc-900 border border-red-800/50 rounded-2xl p-8 shadow-lg hover:shadow-red-900/30 transition-all duration-300"
-          >
-            <HeartPulse className="w-10 h-10 text-red-500 mb-4" />
-            <h3 className="text-xl font-semibold mb-3 text-red-400">
-              Hybrid Matching
-            </h3>
-            <p className="text-gray-400">
-              Advanced hybrid engine connects verified donors with recipients using
-              compatibility and proximity logic.
-            </p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="bg-zinc-900 border border-red-800/50 rounded-2xl p-8 shadow-lg hover:shadow-red-900/30 transition-all duration-300"
-          >
-            <ShieldCheck className="w-10 h-10 text-red-500 mb-4" />
-            <h3 className="text-xl font-semibold mb-3 text-red-400">
-              Hospital Verification
-            </h3>
-            <p className="text-gray-400">
-              Donors are verified by hospitals, ensuring every donation is safe,
-              secure, and trustworthy.
-            </p>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="bg-zinc-900 border border-red-800/50 rounded-2xl p-8 shadow-lg hover:shadow-red-900/30 transition-all duration-300"
-          >
-            <Bell className="w-10 h-10 text-red-500 mb-4" />
-            <h3 className="text-xl font-semibold mb-3 text-red-400">
-              Real-Time Alerts
-            </h3>
-            <p className="text-gray-400">
-              Get notified instantly when a match is found or a donation request is
-              confirmed.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="mt-auto py-10 border-t border-red-900/30 bg-black relative z-10">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-gray-400">
           <p>© {new Date().getFullYear()} BloodBound — Built with ❤️ by Team MantaHQ</p>
-
           <div className="flex gap-5">
             <Link href="https://twitter.com" target="_blank" className="hover:text-red-500">
               <i className="fa-brands fa-x-twitter text-lg" />

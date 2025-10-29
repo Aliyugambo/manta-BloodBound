@@ -1,27 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast, Toaster } from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 export default function AuthPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
+
   const [isLogin, setIsLogin] = useState(true);
   const [role, setRole] = useState('Patient');
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
 
-  // Form states
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
+  // detect query tab
+  useEffect(() => {
+    if (tab === 'register') setIsLogin(false);
+    if (tab === 'login') setIsLogin(true);
+  }, [tab]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,21 +32,23 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        // LOGIN REQUEST
+        // ---- LOGIN ----
         const { data } = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-          {
-            email: form.email,
-            password: form.password,
-          },
+          { email: form.email, password: form.password },
           { withCredentials: true }
         );
 
-        toast.success('Login successful! Redirecting...');
-        localStorage.setItem('token', data.token);
-        setTimeout(() => router.push('/dashboard'), 1000);
+        toast.success('OTP sent! Please verify your email.');
+
+        // store token & role in cookies for middleware use
+        Cookies.set('token', data.token, { expires: 7 });
+        Cookies.set('role', data.role, { expires: 7 });
+
+        // redirect to email verification step
+        setTimeout(() => router.push('/auth/verify-otp'), 1000);
       } else {
-        // REGISTER REQUEST
+        // ---- REGISTER ----
         await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
           username: form.name,
           email: form.email,
@@ -51,18 +56,11 @@ export default function AuthPage() {
           role,
         });
 
-        toast.success('Registration successful! You can now log in.');
+        toast.success('Registration successful! Please check your email for OTP.');
         setIsLogin(true);
       }
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        const message = err.response?.data?.message;
-        toast.error(message || 'An error occurred. Try again.');
-      } else if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error('An error occurred. Try again.');
-      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'An error occurred.');
     } finally {
       setLoading(false);
     }
@@ -73,14 +71,13 @@ export default function AuthPage() {
       <Toaster position="top-right" />
       <div className="absolute inset-0 bg-gradient-to-br from-red-900/30 via-black to-black blur-3xl" />
 
-      {/* Auth Card */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="relative z-10 bg-zinc-900/80 backdrop-blur-md border border-red-800/50 rounded-2xl shadow-lg shadow-red-900/40 w-[95%] max-w-md p-8"
       >
-        {/* Logo and Tagline */}
+        {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-red-500 mb-2">🩸 BloodBound</h1>
           <p className="text-gray-400 text-sm italic">
@@ -112,7 +109,7 @@ export default function AuthPage() {
           </button>
         </div>
 
-        {/* Login Form */}
+        {/* ==== LOGIN FORM ==== */}
         {isLogin ? (
           <motion.form
             onSubmit={handleSubmit}
@@ -147,6 +144,16 @@ export default function AuthPage() {
               />
             </div>
 
+            {/* Forgot Password Link */}
+            <p className="text-right text-sm">
+              <a
+                href="/auth/forgot-password"
+                className="text-red-400 hover:text-red-300 transition-colors"
+              >
+                Forgot password?
+              </a>
+            </p>
+
             <button
               type="submit"
               disabled={loading}
@@ -160,14 +167,18 @@ export default function AuthPage() {
             </button>
 
             <p className="text-center text-gray-500 text-sm mt-4">
-              Forgot password?{' '}
-              <a href="/forgot-password" className="text-red-400 hover:text-red-300">
-                Reset it
-              </a>
+              Don’t have an account?{' '}
+              <button
+                type="button"
+                onClick={() => setIsLogin(false)}
+                className="text-red-400 hover:text-red-300"
+              >
+                Register
+              </button>
             </p>
           </motion.form>
         ) : (
-          /* Register Form */
+          /* ==== REGISTER FORM ==== */
           <motion.form
             onSubmit={handleSubmit}
             initial={{ opacity: 0, y: 20 }}
